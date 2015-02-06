@@ -54,10 +54,10 @@ passport.deserializeUser(Account.deserializeUser());
 // store session to mongodb
 var connectMongoStore = require('connect-mongo')(session);
 app.use(session({
-    secret: 'abc', // cookie secret key
-    cookie: { maxAge: 24*60*60*1000 }, // 1000 = 1 seconds
-    store: new connectMongoStore({
-	db : 'session_store', // mongodb collection name
+		secret: 'abc', // cookie secret key
+		cookie: { maxAge: 24*60*60*1000 }, // 1000 = 1 seconds
+		store: new connectMongoStore({
+		db : 'session_store', // mongodb collection name
     })
 }));
 
@@ -68,9 +68,9 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 
 app.use(function(req,res,next){
 	    if (req.url != '/demo/find-a-word' && req.method != 'POST' && req.session.httpID ==  req.sessionID) {
-		FawPlayer.disableInGame(req.session.passport.user, function (err, result){
-		    if (err) { throw err; }
-		});
+			FawPlayer.disableInGame(req.session.passport.user, function (err, result){
+				if (err) { throw err; }
+			});
 	    }
 
     // variable user dans les templates jade
@@ -134,8 +134,8 @@ io.use(passportSocketIo.authorize({
     secret:      'abcd',    // the session_secret to parse the cookie
     //store:       session,        // we NEED to use a sessionstore. no memorystore please
     store: new connectMongoStore({
-	db: 'session_store',
-	collection: 'sessions'
+		db: 'session_store',
+		collection: 'sessions'
     }),
     success:     onAuthorizeSuccess,  // *optional* callback on success - read more below
     fail:        onAuthorizeFail,     // *optional* callback on fail/error - read more below
@@ -149,7 +149,7 @@ function onAuthorizeSuccess(data, accept) {
 function onAuthorizeFail(data, message, error, accept) {
     console.log('failed connection to socket.io:', message);
     if (error) throw new Error(message);
-    return accept(new Error(message));
+		return accept(new Error(message));
 }
 
 //
@@ -165,8 +165,8 @@ game.generateNewTable();
 
 faw_namespace.use(function(socket, next) {
     if (socket.request.user.logged_in) {
-	game.addPlayer(socket.request.user.username, socket.id);
-	console.log(game.players);
+		game.addPlayer(socket.request.user.username, socket.id);
+		console.log(game.players);
     }
    next();
 });
@@ -179,29 +179,30 @@ faw_namespace.on('connection', function(socket) {
 	var letter = game.setRandomLetterIntoTable(data.x, data.y);
 	//game.displayTableConsole();
 	// et l'envoie vers updateLetter
-	faw_namespace.emit('updateLetter', { letter: letter, 
-					     meshesPos: data.meshesPos,
-					     i: data.x,
-					     j: data.y
-					   });
+	faw_namespace.emit('updateLetter',	{ 
+											letter: letter, 
+											meshesPos: data.meshesPos,
+											i: data.x,
+											j: data.y
+										});
 
 	game.getPlayerWord(socket.id, function(word) {
 	    if (word.length < 25) {
-		console.log('Avant ' + word + ' Length ' + word.length);
-		game.addLetterToWord(data.letter, socket.id);
-		game.getPlayerWord(socket.id, function(word) {
-		    console.log('Après ' + word + ' Length ' + word.length);
-		    if (word.length == 25) {
-			game.defineScore(word, socket.id, function(score) {
-			    console.log('Score ' + score);
-			    socket.emit('clearInput', { clear : true, score : score });
-			    game.getPlayerStats(socket.id, function(stats) {
-				socket.emit('stats', { stats: stats });
-				game.clearPlayerWord(socket.id);
-			    });
+			console.log('Avant ' + word + ' Length ' + word.length);
+			game.addLetterToWord(data.letter, socket.id);
+			game.getPlayerWord(socket.id, function(word) {
+				console.log('Après ' + word + ' Length ' + word.length);
+				if (word.length == 25) {
+					game.defineScore(word, socket.id, function(score) {
+						console.log('Score ' + score);
+						socket.emit('clearInput', { clear : true, score : score });
+						game.getPlayerStats(socket.id, function(stats) {
+							socket.emit('stats', { stats: stats });
+							game.clearPlayerWord(socket.id);
+						});
+					});
+				}
 			});
-		    }
-		});
 	    }
 	});
 
@@ -209,41 +210,41 @@ faw_namespace.on('connection', function(socket) {
 
     // submit, valide le mot, retourne le nombre de points 
     socket.on('submit', function (data) {
-	game.getPlayerWord(socket.id, function(word) {
-	    game.defineScore(word, socket.id, function(score) {
-		socket.emit('score', { score : score });
-		game.clearPlayerWord(socket.id);
+		game.getPlayerWord(socket.id, function(word) {
+			game.defineScore(word, socket.id, function(score) {
+				socket.emit('score', { score : score });
+				game.clearPlayerWord(socket.id);
 
-		game.getPlayerStats(socket.id, function(stats) {
-		    socket.emit('stats', { stats: stats });
+				game.getPlayerStats(socket.id, function(stats) {
+					socket.emit('stats', { stats: stats });
+				});
+			});
 		});
-	    });
-	});
     });
 
     if (game.nbPlayers >= 2) {
-	faw_namespace.emit('title', { message: 2 });
-	faw_namespace.emit('playersList', { playersList: game.getPlayerList() });
-	// envoie le tableau contenant les lettres
-	faw_namespace.emit('start', { table : game.table });
+		faw_namespace.emit('title', { message: 2 });
+		faw_namespace.emit('playersList', { playersList: game.getPlayerList() });
+		// envoie le tableau contenant les lettres
+		faw_namespace.emit('start', { table : game.table });
     }
     else if (game.nbPlayers == 1) {
-	socket.emit('title', { message: 1 });
-	faw_namespace.emit('playersList', { playersList: game.getPlayerList() });
+		socket.emit('title', { message: 1 });
+		faw_namespace.emit('playersList', { playersList: game.getPlayerList() });
     }
 
     socket.on('disconnect', function () {
-	game.removePlayer(socket.id);
-	console.log(game.players); 
-	if (game.nbPlayers >= 2) {
-	    faw_namespace.emit('title', { message: 2 });
-	    faw_namespace.emit('playersList', { playersList: game.getPlayerList() });
-	}
-	else if (game.nbPlayers == 1){
-	    socket.broadcast.emit('title', { message: 1 });
-	    faw_namespace.emit('playersList', { playersList: game.getPlayerList() });
-	    console.log(util.inspect(game.players[0]));
-	}
+		game.removePlayer(socket.id);
+		console.log(game.players); 
+		if (game.nbPlayers >= 2) {
+			faw_namespace.emit('title', { message: 2 });
+			faw_namespace.emit('playersList', { playersList: game.getPlayerList() });
+		}
+		else if (game.nbPlayers == 1){
+			socket.broadcast.emit('title', { message: 1 });
+			faw_namespace.emit('playersList', { playersList: game.getPlayerList() });
+			console.log(util.inspect(game.players[0]));
+		}
     });
 /*
 	FawPlayer.getWebSocketSession(socket.request.user.username, function (err, result){
