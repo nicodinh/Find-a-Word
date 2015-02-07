@@ -8,7 +8,7 @@ router.get('/', function(req, res) {
 
 router.get('/about', function(req, res) {
     res.render('about', {
-	originalUrl : req.originalUrl
+		originalUrl : req.originalUrl
     });
 });
 
@@ -16,7 +16,7 @@ router.get('/references', function(req, res) {
     //console.log("PAGE = " + util.inspect(req));
     //console.log("PAGE = " + req.originalUrl.substring(1, req.originalUrl.length));
     res.render('references', {
-	originalUrl : req.originalUrl
+		originalUrl : req.originalUrl
     });
 });
 

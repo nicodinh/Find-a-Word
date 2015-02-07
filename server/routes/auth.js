@@ -25,11 +25,11 @@ router.get('/register', isNotLoggedIn, function(req, res) {
 router.post('/register', function(req, res) {
     Account.register(new Account({ username : req.body.username }), req.body.password, function(err, account) {
         if (err) {
-	    console.log("Utilisateur existant");
+			console.log("Utilisateur existant");
             return res.render('register', { account : account });
         }
-	console.log("Nouvel utilisateur");
-	res.redirect('/auth');
+		console.log("Nouvel utilisateur");
+		res.redirect('/auth');
     });
 });
 
@@ -75,7 +75,7 @@ router.get('/twitch', isNotLoggedIn, function(req, res) {
 function isNotLoggedIn(req, res, next) {
     // if user is authenticated in the session, go out 
     if (req.isAuthenticated())
-	res.redirect('/');
+		res.redirect('/');
     // if they aren't go on
     return next();
 }
@@ -83,7 +83,7 @@ function isNotLoggedIn(req, res, next) {
 function getUrlCallBack(req, res, next) {
     //console.log('je viens de '+ req.headers.referer);
     if (req.headers.referer.match(/demo\/find-a-word/g))
-	req.session.urlCallBack = '/demo/find-a-word';
+		req.session.urlCallBack = '/demo/find-a-word';
     return next();
 }
 

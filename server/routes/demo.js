@@ -20,10 +20,11 @@ router.get('/find-a-word', fawGetPlayerList, function(req, res) {
 					  });
 	    }
 	    else {
-		req.session.httpID = '';
-		res.render('find-a-word-error', { players : req.players, 
-						  errorPlayer : true 
-						});
+			req.session.httpID = '';
+			res.render('find-a-word-error', { 
+												players : req.players, 
+												errorPlayer : true 
+											});
 	    }
 	}
 	else {
@@ -31,10 +32,10 @@ router.get('/find-a-word', fawGetPlayerList, function(req, res) {
 		req.session.httpID = '';
 	    else
 		req.session.httpID = req.sessionID;
-	    res.render('find-a-word', { user : req.user,
-					players : req.players,
-					inGame : req.inGame 
-				      });
+	    res.render('find-a-word', 	{ 	user : req.user,
+										players : req.players,
+										inGame : req.inGame 
+									});
 	}
     });
 });
@@ -44,15 +45,16 @@ router.post('/find-a-word', fawManagePlayer, fawGetPlayerList, function(req, res
     Faw.getWebSocketSession(req.session.passport.user, function (err, result){
 	if (err) { throw err; }
 	if (_.isEmpty(result.wsId)) {	
-	    res.render('find-a-word', { //players : req.players, 
-					inGame : req.inGame
-				      });
+	    res.render('find-a-word', 	{ //players : req.players, 
+										inGame : req.inGame
+									});
 	}
 	else {
 	    req.session.httpID = '';
-	    res.render('find-a-word-error', { players : req.players, 
-					      errorPlayer : true 
-					    });
+	    res.render('find-a-word-error', 	{ 	
+												players : req.players, 
+												errorPlayer : true 
+											});
 	}
     });
 });
@@ -72,7 +74,7 @@ function fawGetPlayerList(req, res, next) {
 	for (var i in players){
 	    req.players += players[i].playername;
 	    if (i < max)
-		req.players += ', ';
+			req.players += ', ';
 	}
 	return next();
     });
@@ -130,7 +132,7 @@ function fawManagePlayer(req, res, next) {
 
 function fawLeave(req, res, next) {
     Faw.disableInGame(req.session.passport.user, function (err, result){
-	if (err) { throw err; }
+		if (err) { throw err; }
     });
     return next();
 }
