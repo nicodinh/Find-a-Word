@@ -57,9 +57,10 @@ app.use(session({
 		secret: 'abc', // cookie secret key
 		cookie: { maxAge: 24*60*60*1000 }, // 1000 = 1 seconds
 		store: new connectMongoStore({
-		db : 'session_store', // mongodb collection name
-    })
-}));
+			db : 'session_store', // mongodb collection name
+		})
+	})
+);
 
 //app.use(session({ secret: 'abc' })); // store session in memory (memory leak with too many session)
 app.use(passport.initialize());
@@ -67,12 +68,11 @@ app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 
 app.use(function(req,res,next){
-	    if (req.url != '/demo/find-a-word' && req.method != 'POST' && req.session.httpID ==  req.sessionID) {
-			FawPlayer.disableInGame(req.session.passport.user, function (err, result){
-				if (err) { throw err; }
-			});
-	    }
-
+	if (req.url != '/demo/find-a-word' && req.method != 'POST' && req.session.httpID ==  req.sessionID) {
+		FawPlayer.disableInGame(req.session.passport.user, function (err, result){
+			if (err) { throw err; }
+		});
+	}
     // variable user dans les templates jade
     res.locals.user = req.session.passport.user;
     console.log("sessionID : " + req.sessionID);
@@ -265,7 +265,6 @@ faw_namespace.on('connection', function(socket) {
 
 // default namespace and middleware
 io.use(function(socket, next) {
-
     next();
 });
 
